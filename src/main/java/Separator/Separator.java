@@ -1,59 +1,44 @@
 package Separator;
 
-import com.google.gson.Gson;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+public class Separator {
+    private final int id;
+    private final Scanner scan;
+    private double sum = 0;
+    private int amountOfNumbers = 0;
 
-public class Separator implements Runnable {
-
-    private int id;
-    private String string;
-    private ArrayList<Data> queueOfData = new ArrayList<>();
-    ArrayList<String> list = new ArrayList<>();
-
-    public Separator(String string, int id) {
-        this.string = string;
-        this.id = id;
+    public Separator(String origFilePath, int requestedId) {
+        this.id = requestedId;
+        this.scan = new Scanner(Objects.requireNonNull(fileReaderInit(origFilePath)));
     }
 
-    public void run() {
-        read();
-        separateToParts();
-        toData();
-        //System.out.println(getAverageNumberOfThisLine());
-    }
-
-    private void read() {
-        int stringLen = string.length();
-        string = string.substring(13, stringLen - 1);
-        System.out.println(string);
-    }
-
-    private void separateToParts() {
-        while(!string.isEmpty()) {
-            int i = string.indexOf("}") + 1;
-            System.out.println(string);
-            list.add(string.substring(0, i));
-            string = string.substring(i+1 == string.length()? i: i+1);
+    private FileReader fileReaderInit(String origFilePath) {
+        try {
+            return new FileReader(origFilePath);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: file not found. " + e);
         }
+        return null;
     }
 
-    private void toData() {
-        for (int i = 0; i < list.size(); i++) {
-            queueOfData.add((new Gson()).fromJson(list.get(i), Data.class));
-        }
-    }
-
-    private double getAverageNumberOfThisLine() {
-        long sum = 0;
-        int amount = 0;
-        for (int i = 0; i < queueOfData.size(); i++) {
-            if (queueOfData.get(i).getId() == id) {
-                amount++;
-                sum += queueOfData.get(i).getNumber();
+    public void startWork() throws ExecutionException, InterruptedException {
+        while (scan.hasNext()) {
+            FutureTask<Double> future = new FutureTask<>(new Reader(scan.nextLine().substring(12), id));
+            new Thread(future).start();
+            double temp = future.get();
+            if (temp != 0.0) {
+                sum += temp;
+                amountOfNumbers++;
             }
         }
-        return (double) amount / sum;
+        System.out.println("final res " + sum / amountOfNumbers);
     }
+
 }
