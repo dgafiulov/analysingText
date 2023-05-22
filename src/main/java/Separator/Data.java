@@ -1,9 +1,9 @@
 package Separator;
 
 public class Data {
-    private String name;
-    private int id;
-    private long number;
+    private final String name;
+    private final int id;
+    private final long number;
 
     public Data(String name, int id, long number) {
         this.name = name;

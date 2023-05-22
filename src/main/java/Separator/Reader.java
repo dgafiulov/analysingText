@@ -1,8 +1,6 @@
 package Separator;
 
 import com.google.gson.Gson;
-
-import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 public class Reader implements Callable<Double> {

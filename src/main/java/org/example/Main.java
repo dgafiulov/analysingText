@@ -1,7 +1,6 @@
 package org.example;
 
 import Separator.Separator;
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
